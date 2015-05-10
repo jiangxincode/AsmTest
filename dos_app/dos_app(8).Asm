@@ -1,0 +1,19 @@
+.MODEL SMALL,C
+.DATA
+	buff DB "This is a example.",0
+.CODE
+StrLen PROC USES AX BX,String:PTR BYTE
+MOV BX,String
+XOR CX,CX
+MOV AL,[BX]
+.WHILE AL!=0
+INC CX 
+INC BX 
+MOV AL,[BX]
+.ENDW
+RET
+StrLen ENDP
+.STARTUP
+INVOKE Strlen,ADDR buff 
+.EXIT 0
+END

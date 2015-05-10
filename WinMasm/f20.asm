@@ -1,0 +1,60 @@
+DATA SEGMENT
+MESG1 db 0DH,0AH,'FOUND$'
+MESG2 db 0DH,0AH,'NO FOUND$'
+MESG3 db 'ENTER KEYWORD:$'
+BUFFER  dw  3213,5128,57826,7632,1387
+        dw  45321,928,9876,1899,45678
+COUNT EQU ($-BUFFER)/2
+_ADDR  dw  0
+DATA ENDS
+CODE SEGMENT
+  ASSUME  CS:CODE,DS:DATA
+START:
+MOV AX,DATA
+MOV DS,AX
+MOV AH,9
+MOV DX,OFFSET MESG3
+INT 21H
+CALL  DECIBIN
+MOV  AX,BX
+MOV   DI,OFFSET BUFFER
+MOV  CX,COUNT
+NEXT:     CMP AX,[DI]
+          JE  OK
+          ADD  DI,2
+          LOOP  NEXT
+          MOV _ADDR,-1
+          MOV  DX,OFFSET  MESG2
+          JMP   SHORT DISPLAY
+OK:       MOV  _ADDR,DI
+          MOV   DX,OFFSET MESG1
+DISPLAY:  MOV   AH,9
+          INT   21H
+          MOV  AH,4CH
+          INT   21H
+
+
+DECIBIN   PROC   NEAR
+MOV   BX,0
+NEWCHAR:
+MOV    AH,1
+INT    21H
+SUB  AL,30H
+cmp  al,0
+Jb    EXIT
+CMP  AL,9
+Ja  EXIT
+CBW
+add  ax,bx
+mov cx,10
+mul cx
+mov bx,ax
+JMP   NEWCHAR
+EXIT:
+mov ax,bx
+div cx
+mov bx,ax
+ RET
+DECIBIN  ENDP
+CODE  ENDS
+         END START
